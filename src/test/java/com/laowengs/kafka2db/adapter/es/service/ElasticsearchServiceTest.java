@@ -34,4 +34,37 @@ class ElasticsearchServiceTest {
     void addDocument() throws EsException {
 
     }
+
+    @Test
+    void testExistIndex() {
+    }
+
+    @Test
+    void testCreateIndex() {
+    }
+
+    @Test
+    void testAddDocument() {
+    }
+
+    @Test
+    void testAddDocument1() {
+    }
+
+    @Test
+    void deleteDocumentById() throws EsException {
+        elasticsearchService.deleteDocumentById("products2","0");
+    }
+
+    @Test
+    void batchAddDocumentWithId() {
+    }
+
+    @Test
+    void batchAddDocument() {
+    }
+
+    @Test
+    void findApplogs() {
+    }
 }

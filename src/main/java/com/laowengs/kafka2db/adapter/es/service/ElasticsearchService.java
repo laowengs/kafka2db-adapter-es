@@ -3,6 +3,7 @@ package com.laowengs.kafka2db.adapter.es.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.core.DeleteRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
@@ -74,14 +75,25 @@ public class ElasticsearchService {
      */
     public void addDocument(String indexName,Object document, String id) throws EsException {
         try {
-            if (!this.existIndex(indexName)) {
-                this.createIndex(indexName);
-            }
+//            if (!this.existIndex(indexName)) {
+//                this.createIndex(indexName);
+//            }
             client.index(i -> i.index(indexName)
                     .id(id)
                     .document(document));
         } catch (IOException e) {
-            throw new EsException("向es中添加document出错!", e.getMessage());
+            throw new EsException("向es中添加document出错!", e);
+        }
+    }
+
+    public void deleteDocumentById(String indexName,String id) throws EsException {
+        try {
+            DeleteRequest.Builder builder = new DeleteRequest.Builder();
+            builder.id(id).index(indexName);
+            client.delete(builder.build());
+
+        } catch (IOException e) {
+            throw new EsException("es删除document出错!", e);
         }
     }
     
