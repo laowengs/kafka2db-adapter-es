@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: kafka2db-adapter-es
+apollo:
+  bootstrap:
+    enabled: true
+    namespaces: application,elasticsearch,kafka
+    eagerLoad:
+      enabled: true
+  meta: http://192.168.3.21:8083
+
