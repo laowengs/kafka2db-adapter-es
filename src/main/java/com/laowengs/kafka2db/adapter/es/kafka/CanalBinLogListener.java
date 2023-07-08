@@ -10,6 +10,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -78,14 +79,21 @@ public class CanalBinLogListener {
     private static String getPkValue(List<String> pkNames , Map<String, Object> dataMap) {
         // 获取主键内容
         String pk = null;
-        for (String pkName : pkNames) {
-            String value = String.valueOf(dataMap.get(pkName));
-            if(pk == null){
-                pk = value;
-            }else{
-                pk = pk + ":" + value;
+        if(!CollectionUtils.isEmpty(pkNames)){
+            for (String pkName : pkNames) {
+                Object valueObj = dataMap.get(pkName);
+                if(valueObj == null){
+                    return null;
+                }
+                String value = String.valueOf(dataMap.get(pkName));
+                if(pk == null){
+                    pk = value;
+                }else{
+                    pk = pk + ":" + value;
+                }
             }
         }
+
         return pk;
     }
 
