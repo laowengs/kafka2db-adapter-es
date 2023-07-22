@@ -10,10 +10,10 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.transport.endpoints.BooleanResponse;
 import com.laowengs.kafka2db.adapter.es.config.EsException;
 import com.laowengs.kafka2db.adapter.es.core.EsBaseEntity;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
