@@ -1,6 +1,7 @@
 package com.laowengs.kafka2db.adapter.es.kafka;
 
 import com.laowengs.kafka2db.adapter.es.enums.CanalTypeEnum;
+import com.laowengs.kafka2db.adapter.es.properties.KafkaAdapterProperties;
 import com.laowengs.kafka2db.adapter.es.service.ElasticsearchService;
 import com.laowengs.kafka2db.adapter.es.utils.JsonUtil;
 import com.laowengs.kafka2db.adapter.es.vo.CanalBinlogVo;
@@ -14,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -22,11 +24,14 @@ public class CanalBinLogListener {
     @Autowired
     private ElasticsearchService elasticsearchService;
 
+    @Autowired
+    private KafkaAdapterProperties kafkaAdapterProperties;
+
     @KafkaListener(topics = {"mysql_binlog"})
     public void consumer(List<ConsumerRecord<String,String>> consumerRecords, Consumer consumer) {
         for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
             String msg = consumerRecord.value();
-            log.info("消费kafka消息 {} ", msg);
+            log.info("消费kafka消息{} ",consumerRecord);
             try {
                 CanalBinlogVo canalBinlogVo = JsonUtil.convertObj(msg, CanalBinlogVo.class);
                 List<Map<String, Object>> data = canalBinlogVo.getData();
@@ -45,9 +50,19 @@ public class CanalBinLogListener {
                     continue;
                 }
 
-                if(data.size() == 0){
+                if(data.isEmpty()){
                     log.info("consumerRecord topic {} partition {} offset {} :binlog data is empty,message {} ",
                             consumerRecord.topic(),consumerRecord.partition(),consumerRecord.offset(),msg);
+                    continue;
+                }
+                Map<String, Set<String>> binlogDataSource = kafkaAdapterProperties.getBinlogDataSource();
+                if(CollectionUtils.isEmpty(binlogDataSource)){
+                    log.debug("don`t configuration need sync dataSource info");
+                    continue;
+                }
+                Set<String> tableSet = binlogDataSource.get(database);
+                if(tableSet == null || !tableSet.contains(table)){
+                    log.debug("database {} don`t configuration need sync table info",database);
                     continue;
                 }
                 String index = database+"-"+table;
